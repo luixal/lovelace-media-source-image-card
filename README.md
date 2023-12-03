@@ -50,9 +50,34 @@ This card is quite simple so there are only a few options:
 | Name | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | type | string | `custom:media-source-image-card` | **REQUIRED** |
-| image | string | | **REQUIRED** The path to the image in media source format. i.e: media-source://media_source/local/my_image.jpg | |
+| image | string | | **REQUIRED** The path to the image in media source format. i.e: media-source://media_source/local/my_image.jpg |
 | entity_id | string | | The entity you want to toggle when card is clicked |
 | apply_grayscale | boolean | | If `true` applies a grayscale on the image when entity is `off` |
+| tap_action | string | `toggle` | Action to perform on click. One of `none`, `toggle` or `call-service`. See actions below |
+
+## Actions
+By default, when the card is clicked, it would toggle the entity. You can customize these action to be one of this:
+
+- `none`: nothing happens
+- `toggle`: the entity is toggled (default behaviour)
+- `call-service`: a service is called with a custom configuration
+
+### Call Service
+This is a simple call service example:
+
+```yaml
+type: custom:media-source-image-card
+image: media-source://media_source/local/banana.png
+entity_id: input_boolean.boolean_test
+apply_grayscale: true
+tap_action:
+  action: call-service
+  service: input_boolean.turn_on
+  target:
+    entity_id: input_boolean.boolean_test
+```
+
+If no `target` is provided, the `entity_id` field is used.
 
 ## Examples
 
@@ -86,3 +111,17 @@ apply_grayscale: true
 ```
 
 ![basic_control_on](./images/basic_control_on.png) ![basic_control_of](./images/basic_control_off.png)
+
+### Image with switching a boolean input helper using a service call
+
+```yaml
+type: custom:media-source-image-card
+image: media-source://media_source/local/banana.png
+entity_id: input_boolean.boolean_test
+apply_grayscale: true
+tap_action:
+  action: call-service
+  service: input_boolean.turn_on
+  target:
+    entity_id: input_boolean.boolean_test
+```
