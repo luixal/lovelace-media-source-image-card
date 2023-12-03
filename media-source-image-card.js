@@ -89,13 +89,24 @@ class MediaSourceImageCard extends HTMLElement {
   }
 
   handleClick() {
-    if (this.config.entity_id) this._hass.callService(
-      'homeassistant',
-      'toggle',
-      {
-        entity_id: this.config.entity_id
-      }
-    );
+    // actions: toggle, call-service, none, (unsupported -->) more-info, navigate, url
+    // handle none case:
+    if (this.config.tap_action == 'none') return;
+    // default values for toggle case:
+    let domain = 'homeassistant';
+    let service = 'toggle';
+    let target = { entity_id: this.config.entity_id };
+    let data = {};
+    // handle call-service case:
+    if (this.config.tap_action?.action == 'call-service') {
+      let _data = this.config.tap_action;
+      domain = _data.service.split('.')[0];
+      service = _data.service.split('.')[1];
+      if (_data.target) target = _data.target;
+      if (_data.data) data = _data.data;
+    }
+    // call service:
+    this._hass.callService(domain, service, target, data);
   }
 
   getCardSize() {
