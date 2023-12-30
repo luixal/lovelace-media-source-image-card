@@ -65,10 +65,16 @@ class MediaSourceImageCard extends HTMLElement {
     );
   }
 
+  renderJsTemplate(template) {
+    let _template = template.replace('[[[', '').replace(']]]', '');
+    return new Function('hass', 'states', 'user', 'config', `'use strict'; ${_template}`).call(this, this._hass, this._hass.states, this._hass.user, this.config);
+  }
+
   getImageUrl(image) {
     return new Promise(
       resolve => {
         if (this.config.image.indexOf('{{') > -1) return resolve(this.renderTemplate(image));
+        if (this.config.image.indexOf('[[[') > -1) return resolve(this.renderJsTemplate(image));
         return resolve(image);
       }
     );
