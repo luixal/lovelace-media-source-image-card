@@ -79,6 +79,57 @@ tap_action:
 
 If no `target` is provided, the `entity_id` field is used.
 
+### Templating
+You can use templates in the `image` field. In fact, you can use jinja2 and javascript templates.
+
+The main difference is that jinja templates are rendered in the server and tend to hit perfomance overall while javascript templates run locally in the browser and need no additional messaging with the server.
+
+Personally, I prefer javascript templates :)
+
+#### Jinja2 Templates
+You can use jinja templates like this:
+
+```yaml
+type: custom:media-source-image-card
+image: |
+  media-source://media_source/local/{{ states('input_text.image') }}
+entity_id: input_boolean.boolean_test
+apply_grayscale: true
+tap_action:
+  action: call-service
+  service: input_boolean.turn_on
+  target:
+    entity_id: input_boolean.boolean_test
+```
+
+#### Javascript Templates
+You can also provide a javascript template like this:
+
+```yaml
+type: custom:media-source-image-card
+image: |
+  [[[
+    return `media-source://media_source/local/${ hass.states['input_text.texting'].state }`;
+  ]]]
+entity_id: input_boolean.boolean_test
+apply_grayscale: true
+tap_action:
+  action: call-service
+  service: input_boolean.turn_on
+  target:
+    entity_id: input_boolean.boolean_test
+```
+
+You need to enclose your function between triple brackets ('[[[' and ']]]'). The variables available in the function are:
+
+| Variable | Description |
+| -------- | ----------- |
+| hass | The whole hass object where you can access everything |
+| states | The states object inside `hass` |
+| user | The object with information about the logged user |
+| config | The card config itself |
+
+
 ## Examples
 
 ### Simple Image
