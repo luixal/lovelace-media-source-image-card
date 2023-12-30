@@ -32,6 +32,11 @@ class MediaSourceImageCard extends HTMLElement {
                 -webkit-filter: grayscale();
             }
 
+            .error {
+              font-size: large;
+              color: red;
+            }
+
         </style>
         <ha-card>
             <div class="card-content">
@@ -42,6 +47,31 @@ class MediaSourceImageCard extends HTMLElement {
       this.content = this.querySelector("div");
       this.content.addEventListener('click', () => this.handleClick())
     }
+  }
+
+  renderTemplate(template) {
+    return new Promise(
+      resolve => {
+        this._hass.connection.subscribeMessage(
+          output => {
+            return resolve(output.result);
+          },
+          {
+            type: 'render_template',
+            template
+          }
+        );
+      }
+    );
+  }
+
+  getImageUrl(image) {
+    return new Promise(
+      resolve => {
+        if (this.config.image.indexOf('{{') > -1) return resolve(this.renderTemplate(image));
+        return resolve(image);
+      }
+    );
   }
 
   setConfig(config) {
@@ -57,16 +87,19 @@ class MediaSourceImageCard extends HTMLElement {
     if (!this.content) this.renderBase();
     // resolve image from media source and render it:
     if (!this.image || this.image != this.config.image) {
-      this.image = this.config.image;
-      hass.callWS({
-        type: "media_source/resolve_media",
-        media_content_id: this.config.image
-      }).then(response => {
-        this.content.innerHTML = `
-                      <img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? hass.states[this.config.entity_id].state : ''}">
-                  `;
-      }
-      );
+      this.getImageUrl(this.config.image)
+        .then(imageUrl => {
+          this.image = imageUrl;
+          hass.callWS({
+            type: "media_source/resolve_media",
+            media_content_id: this.image
+          }).then(response => {
+            this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? hass.states[this.config.entity_id].state : ''}">`;
+          }).catch(error => {
+            this.content.innerHTML = `<span class="error">Error loading image: ${error.message} </span>`;
+            console.error({config: this.config, error});
+          });
+        })
     }
     // apply grayscale:
     if (this.config.entity_id) {
@@ -124,7 +157,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.1.0 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.1.2 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
