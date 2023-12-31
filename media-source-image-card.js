@@ -93,12 +93,12 @@ class MediaSourceImageCard extends HTMLElement {
     if (!this.content) this.renderBase();
     // resolve image from media source and render it:
     if (!this.image || this.image != this.config.image) {
+      this.image = this.config.image;
       this.getImageUrl(this.config.image)
         .then(imageUrl => {
-          this.image = imageUrl;
           hass.callWS({
             type: "media_source/resolve_media",
-            media_content_id: this.image
+            media_content_id: imageUrl
           }).then(response => {
             this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? hass.states[this.config.entity_id].state : ''}">`;
           }).catch(error => {
@@ -163,7 +163,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.1.2 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.0 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
