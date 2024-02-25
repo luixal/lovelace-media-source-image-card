@@ -87,20 +87,48 @@ class MediaSourceImageCard extends HTMLElement {
     this.config = config;
   }
 
+  watchEntities(input, hass) {
+    if (!this.entitiesToWatch) this.entitiesToWatch = {};
+    let entites = input.match(/[0-9a-zA-z]*\.[0-9a-zA-z]*/);
+    let hasChanged = false;
+    for (const entity of entites) {
+      if (hass.entities[entity]) {
+        if (!this.entitiesToWatch[entity]) {
+          // new entity found:
+          hasChanged = true;
+          this.entitiesToWatch[entity] = hass.states[entity].state;
+        } else {
+          if (this.entitiesToWatch[entity] !== hass.states[entity].state) {
+            // existing entity state changed:
+            hasChanged = true;
+            this.entitiesToWatch[entity] = hass.states[entity].state;
+            return true;
+          }
+        }
+      }
+    }
+    // returns true if there's any new entity or state change:
+    return hasChanged;
+  }
+
   set hass(hass) {
     this._hass = hass;
     // render base html:
     if (!this.content) this.renderBase();
     // resolve image from media source and render it:
-    if (!this.image || this.image != this.config.image) {
-      this.image = this.config.image;
+    // if (!this.image || this.image != this.config.image) {
+    //   this.image = this.config.image;
+    if (this.watchEntities(this.config.image, hass)) {
       this.getImageUrl(this.config.image)
         .then(imageUrl => {
           hass.callWS({
             type: "media_source/resolve_media",
             media_content_id: imageUrl
           }).then(response => {
-            this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? hass.states[this.config.entity_id].state : ''}">`;
+            if (this.image != response.url) {
+              this.image = response.url;
+              this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? hass.states[this.config.entity_id].state : ''}">`;
+            }
           }).catch(error => {
             this.content.innerHTML = `<span class="error">Error loading image: ${error.message} </span>`;
             console.error({config: this.config, error});
