@@ -73,14 +73,24 @@ class MediaSourceImageCard extends HTMLElement {
     return new Function('hass', 'states', 'user', 'config', `'use strict'; ${_template}`).call(this, this._hass, this._hass.states, this._hass.user, this.config);
   }
 
-  getImageUrl(image) {
+  getMediaUrl(url) {
     return new Promise(
       resolve => {
-        if (this.config.image.indexOf('{{') > -1) return resolve(this.renderTemplate(image));
-        if (this.config.image.indexOf('[[[') > -1) return resolve(this.renderJsTemplate(image));
-        return resolve(image);
+        if (this.config.image.indexOf('media-source://') == -1) return resolve({url});
+        return resolve(this._hass.callWS({
+          type: "media_source/resolve_media",
+          media_content_id: url
+        }));
       }
     );
+  }
+
+  async getImageUrl(image) {
+      // if template, resolve rendered template:
+      if (this.config.image.indexOf('{{') > -1) return this.getMediaUrl(await this.renderTemplate(image));
+      if (this.config.image.indexOf('[[[') > -1) return this.getMediaUrl(await this.renderJsTemplate(image));
+      // else, call HA service to get media source url:
+      return this.getMediaUrl(image);
   }
 
   setConfig(config) {
@@ -116,24 +126,16 @@ class MediaSourceImageCard extends HTMLElement {
 
   renderContent() {
     this.getImageUrl(this.config.image)
-        .then(imageUrl => {
-          this._hass.callWS({
-            type: "media_source/resolve_media",
-            media_content_id: imageUrl
-          }).then(response => {
-            if (this.image != response.url) {
-              this.image = response.url;
-              if (response.url.indexOf('mp4') != -1 || response.url.indexOf('ogg') != -1 || response.url.indexOf('webm') != -1) {
-                this.content.innerHTML = `<video width="${this.config.video_options?.width || '320'}" height="${this.config.video_options?.height || '240'}" ${this.config.video_options?.show_controls ? 'controls' : ''} ${this.config.video_options?.loop ? 'loop' : ''} ${this.config.video_options?.autoplay ? 'autoplay' : ''} ${this.config.video_options?.muted ? 'muted' : ''} ${this.config.video_options?.type ? `type=${this.config.video_options?.type}`: ''}><source src="${response.url}"></source></video>`;
-              } else {
-                this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? this._hass.states[this.config.entity_id].state : ''}">`;
-              }
+      .then(response => {
+          if (this.image != response.url) {
+            this.image = response.url;
+            if (response.url.indexOf('mp4') != -1 || response.url.indexOf('ogg') != -1 || response.url.indexOf('webm') != -1) {
+              this.content.innerHTML = `<video width="${this.config.video_options?.width || '320'}" height="${this.config.video_options?.height || '240'}" ${this.config.video_options?.show_controls ? 'controls' : ''} ${this.config.video_options?.loop ? 'loop' : ''} ${this.config.video_options?.autoplay ? 'autoplay' : ''} ${this.config.video_options?.muted ? 'muted' : ''} ${this.config.video_options?.type ? `type=${this.config.video_options?.type}`: ''}><source src="${response.url}"></source></video>`;
+            } else {
+              this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? this._hass.states[this.config.entity_id].state : ''}">`;
             }
-          }).catch(error => {
-            this.content.innerHTML = `<span class="error">Error loading image: ${error.message} </span>`;
-            console.error({config: this.config, error});
-          });
-        })
+          }
+      })
   }
 
   set hass(hass) {
@@ -201,7 +203,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.2 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.3 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
