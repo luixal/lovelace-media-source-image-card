@@ -102,9 +102,10 @@ class MediaSourceImageCard extends HTMLElement {
 
   watchEntities(input, hass) {
     if (!this.entitiesToWatch) this.entitiesToWatch = {};
-    let entites = input.match(/[0-9a-zA-z]*\.[0-9a-zA-z]*/);
+    let entities = [...input.matchAll(/[0-9a-zA-z]*\.[0-9a-zA-z]*/g)];
     let hasChanged = false;
-    for (const entity of entites) {
+    for (const entity of entities.map(e => e[0])) {
+      //const _entity = entity[0];
       if (hass.entities[entity]) {
         if (!this.entitiesToWatch[entity]) {
           // new entity found:
@@ -130,7 +131,7 @@ class MediaSourceImageCard extends HTMLElement {
           if (this.image != response.url) {
             this.image = response.url;
             if (response.url.indexOf('mp4') != -1 || response.url.indexOf('ogg') != -1 || response.url.indexOf('webm') != -1) {
-              this.content.innerHTML = `<video width="${this.config.video_options?.width || '320'}" height="${this.config.video_options?.height || '240'}" ${this.config.video_options?.show_controls ? 'controls' : ''} ${this.config.video_options?.loop ? 'loop' : ''} ${this.config.video_options?.autoplay ? 'autoplay' : ''} ${this.config.video_options?.muted ? 'muted' : ''} ${this.config.video_options?.type ? `type=${this.config.video_options?.type}`: ''}><source src="${response.url}"></source></video>`;
+              this.content.innerHTML = `<video width="${this.config.video_options?.width || '320'}" height="${this.config.video_options?.height || '240'}" ${this.config.video_options?.show_controls ? 'controls' : ''} ${this.config.video_options?.loop ? 'loop' : ''} ${this.config.video_options?.autoplay ? 'autoplay' : ''} ${this.config.video_options?.muted ? 'muted' : ''} ${this.config.video_options?.type ? `type=${this.config.video_options?.type}`: ''}><source src="${response.url}" playsInLine></source></video>`;
             } else {
               this.content.innerHTML = `<img src=${response.url} class="${(this.config.entity_id && this.config.apply_grayscale) ? this._hass.states[this.config.entity_id].state : ''}">`;
             }
@@ -203,7 +204,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.3 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.4 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
