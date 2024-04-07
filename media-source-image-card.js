@@ -76,7 +76,7 @@ class MediaSourceImageCard extends HTMLElement {
   getMediaUrl(url) {
     return new Promise(
       resolve => {
-        if (this.config.image.indexOf('media-source://') == -1) return resolve({url});
+        if (url.indexOf('media-source://') == -1) return resolve({url});
         return resolve(this._hass.callWS({
           type: "media_source/resolve_media",
           media_content_id: url
@@ -86,11 +86,11 @@ class MediaSourceImageCard extends HTMLElement {
   }
 
   async getImageUrl(image) {
-      // if template, resolve rendered template:
-      if (this.config.image.indexOf('{{') > -1) return this.getMediaUrl(await this.renderTemplate(image));
-      if (this.config.image.indexOf('[[[') > -1) return this.getMediaUrl(await this.renderJsTemplate(image));
-      // else, call HA service to get media source url:
-      return this.getMediaUrl(image);
+    // if template, resolve rendered template:
+    if (this.config.image.indexOf('{{') > -1) return this.getMediaUrl(await this.renderTemplate(image));
+    if (this.config.image.indexOf('[[[') > -1) return this.getMediaUrl(await this.renderJsTemplate(image));
+    // else, call HA service to get media source url:
+    return this.getMediaUrl(image);
   }
 
   setConfig(config) {
@@ -204,7 +204,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.4 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.5 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
