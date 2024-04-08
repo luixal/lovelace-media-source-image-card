@@ -148,6 +148,10 @@ class MediaSourceImageCard extends HTMLElement {
     }
     // when a related entity changes, refresh content:
     if (this.watchEntities(this.config.image, hass)) this.renderContent();
+    // if forced_refresh_interval is set, register timeout to re-render content:
+    if (this.config.forced_refresh_interval && !this.forced_refresh_interval) {
+      this.forced_refresh_interval = setInterval(() => {console.log('timeout!!!!!!'); this.renderContent() }, this.config.forced_refresh_interval * 1000);
+    }
     // apply grayscale according to entity state:
     if (this.config.entity_id) {
       const newState = hass.states[this.config.entity_id].state;
@@ -204,7 +208,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.2.5 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.3.0 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );

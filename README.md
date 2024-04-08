@@ -53,6 +53,7 @@ This card is quite simple so there are only a few options:
 | image | string | | **REQUIRED** The path to the image in media source format. i.e: media-source://media_source/local/my_image.jpg |
 | entity_id | string | | The entity you want to toggle when card is clicked |
 | apply_grayscale | boolean | | If `true` applies a grayscale on the image when entity is `off` |
+| forced_refresh_interval | integer | | Number of seconds to force an image refresh |
 | tap_action | string | `toggle` | Action to perform on click. One of `none`, `toggle` or `call-service`. See actions below |
 
 ## Actions
@@ -170,6 +171,23 @@ type: custom:media-source-image-card
 image: media-source://media_source/local/banana.png
 entity_id: input_boolean.boolean_test
 apply_grayscale: true
+tap_action:
+  action: call-service
+  service: input_boolean.turn_on
+  target:
+    entity_id: input_boolean.boolean_test
+```
+
+### Random image using just a template
+This will refresh the image every 10 seconds, resolving the template again and showing a random image in a `X.png` format, where `X` is a number.
+
+```yaml
+type: custom:media-source-image-card
+image: |
+  media-source://media_source/local/{{ '%02d' % range(1, 20) | random }}.png
+entity_id: input_boolean.boolean_test
+apply_grayscale: true
+forced_refresh_interval: 10
 tap_action:
   action: call-service
   service: input_boolean.turn_on
