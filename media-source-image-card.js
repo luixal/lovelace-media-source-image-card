@@ -205,7 +205,7 @@ window.customCards.push({
 });
 
 console.info(
-  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.4.0 `,
+  `%c  MEDIA SOURCE IMAGE CARD %c Version 0.5.0 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
