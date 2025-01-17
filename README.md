@@ -51,6 +51,8 @@ This card is quite simple so there are only a few options:
 | ---- | ---- | ------- | ----------- |
 | type | string | `custom:media-source-image-card` | **REQUIRED** |
 | image | string | | **REQUIRED** The path to the image in media source format. i.e: media-source://media_source/local/my_image.jpg |
+| width | string | '100%' | Image width |
+| height | string | '100%' | Image height |
 | entity_id | string | | The entity you want to toggle when card is clicked |
 | apply_grayscale | boolean | | If `true` applies a grayscale on the image when entity is `off` |
 | forced_refresh_interval | integer | | Number of seconds to force an image refresh |
