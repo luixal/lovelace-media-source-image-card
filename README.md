@@ -10,6 +10,24 @@ This cards allows you to store your images in a the media source module of Home 
 
 It can also toggle an entity if provided in configuration, like a light, switch, etc.
 
+## Index
+
+- [Installation](#installation)
+  - [Manual Installation](#manual-installation)
+  - [Using HACS](#using-hacs)
+- [Configuration](#configuration)
+- [Actions](#actions)
+  - [Call Service](#call-service)
+- [Templating](#templating)
+  - [Jinja2 Templates](#jinja2-templates)
+  - [Javascript Templates](#javascript-templates)
+- [Examples](#examples)
+  - [Simple Image](#simple-image)
+  - [Image with switch control](#image-with-switch-control)
+  - [Image with switch control applying grayscale](#image-with-switch-control-applying-grayscale)
+  - [Image with switching a boolean input helper using a service call](#image-with-switching-a-boolean-input-helper-using-a-service-call)
+  - [Random image using just a template](#random-image-using-just-a-template)
+
 ## Installation
 
 ### Manual Installation
@@ -67,8 +85,13 @@ This card is quite simple so there are only a few options:
 | forced_refresh_interval | integer | | Number of seconds to force an image refresh |
 | tap_action | string | `toggle` | Action to perform on click. One of `none`, `toggle` or `call-service`. See actions below |
 
-## Adding to dashboard
+</br>
 
+Anyway, this is much easier now that you can now use the great editor made by [@tdjones](https://github.com/tdjones). It's an amazing work (thank you!) and looks like this:
+
+</br>
+
+![editor](./images/editor.png)
 
 
 ## Actions
@@ -95,7 +118,7 @@ tap_action:
 
 If no `target` is provided, the `entity_id` field is used.
 
-### Templating
+## Templating
 You can use templates in the `image` field. In fact, you can use jinja2 and javascript templates.
 
 The main difference is that jinja templates are rendered in the server and tend to hit perfomance overall while javascript templates run locally in the browser and need no additional messaging with the server.
@@ -177,7 +200,7 @@ entity_id: switch.light_switch
 apply_grayscale: true
 ```
 
-![basic_control_on](./images/basic_control_on.png) ![basic_control_of](./images/basic_control_off.png)
+![basic_control_on](./images/basic.png) ![basic_control_of](./images/basic_control_off.png)
 
 ### Image with switching a boolean input helper using a service call
 
