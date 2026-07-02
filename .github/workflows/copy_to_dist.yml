@@ -1,0 +1,22 @@
+name: Copy to dist
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nearform-actions/github-action-copy-files@v1
+        with:
+          source: './src/**'
+          destination: './dist/'
+          options: |
+            {
+              "overwrite": true,
+              "flat": true
+            }

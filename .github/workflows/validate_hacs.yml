@@ -1,10 +1,10 @@
 name: HACS Action
 
 on:
-  workflow_dispatch:
-  push:
-    tags:
-      - '*'
+  workflow_run:
+    workflows: ["Copy to dist"]
+    types:
+      - completed
 
 jobs:
   hacs:
