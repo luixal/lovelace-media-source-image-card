@@ -14,6 +14,6 @@ jobs:
     - name: copy file
       uses: canastro/copy-file-action@master
       with:
-        source: "./src/*"
-        target: "./dist/"
+        source: "./src"
+        target: "./dist"
         flags: "-r"
