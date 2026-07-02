@@ -10,13 +10,10 @@ jobs:
   copy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: nearform-actions/github-action-copy-files@v1
-        with:
-          source: './src/**'
-          destination: './dist/'
-          options: |
-            {
-              "overwrite": true,
-              "flat": true
-            }
+    - uses: actions/checkout@master
+    - name: copy file
+      uses: canastro/copy-file-action@master
+      with:
+        source: "./src/*"
+        target: "./dist/"
+        flags: "-r"
