@@ -1,6 +1,6 @@
 {
   "name": "Media Source Image Card",
   "content_in_root": false,
-  "filename": "dist/media-source-image-card.js",
+  "filename": "media-source-image-card.js",
   "render_readme": true
 }
